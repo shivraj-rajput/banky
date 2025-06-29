@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash,session
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 import csv
 from io import StringIO
@@ -21,28 +21,32 @@ class User(db.Model):
 with app.app_context():
     db.create_all()
 
-USER_CREDENTIALS ={
-    "username":"admin",
-    "password":"1234"
-}
-@app.route("/login",methods=["GET","POST"])
+USER_CREDENTIALS = {"username": "admin", "password": "1234"}
+
+
+@app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        username= request.form.get("username")
-        password= request.form.get("password")
-        if username==USER_CREDENTIALS["username"] and password== USER_CREDENTIALS["password"]:
-            session["user"]= username
-            flash("Lgin successful","success")
+        username = request.form.get("username")
+        password = request.form.get("password")
+        if (
+            username == USER_CREDENTIALS["username"]
+            and password == USER_CREDENTIALS["password"]
+        ):
+            session["user"] = username
+            flash("Lgin successful", "success")
             return redirect(url_for("show_users"))
         else:
             flash("Invalid credential", "danger")
     return render_template("login.html")
 
+
 @app.route("/logout")
 def logout():
-    session.pop("user",None)
+    session.pop("user", None)
     flash("LOgout successful", "success")
     return redirect(url_for("login"))
+
 
 @app.route("/users")
 def show_users():
@@ -96,26 +100,30 @@ def delete(user_id):
     flash("User deleted successfully", "success")
     return redirect(url_for("show_users"))
 
+
 @app.route("/download")
 def download_users():
     users = User.query.order_by(User.id).all()
-    
+
     si = StringIO()
     cw = csv.writer(si)
-    cw.writerow(["ID","Name"])
-    
+    cw.writerow(["ID", "Name"])
+
     for user in users:
         cw.writerow([user.id, user.name])
-        
+
     output = si.getvalue()
     si.close()
-    
+
     return Response(
-        output, mimetype="text/csv", headers={"content-Disposition":"attachment;filename=users.csv"}
+        output,
+        mimetype="text/csv",
+        headers={"content-Disposition": "attachment;filename=users.csv"},
     )
+
 
 import os
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT",5000))
+    port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
