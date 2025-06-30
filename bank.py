@@ -63,7 +63,6 @@ def show_users():
 
 @app.route("/", methods=["GET", "POST"])
 def home():
-    return "App running succesful"
     if "user" not in session:
         flash("Please login first", "danger")
         return redirect(url_for("login"))
