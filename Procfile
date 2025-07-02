@@ -1,1 +1,1 @@
-web: gunicorn bank:app
+web: gunicorn bank:app --bind 0.0.0.0:$PORT
